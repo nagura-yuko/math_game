@@ -1,0 +1,89 @@
+canvas {
+    height: 280px;
+    width: 280px;
+    border: 2px solid black;
+    border-radius: 25px;
+    display: block;
+    margin: 10px auto;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    font-size: 18px;
+    background: linear-gradient(70deg, #5ac8fa 50%, #ff6464 50%);
+}
+
+#problem-area {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: black;
+}
+
+#hint-area {
+    margin-bottom: 10px;
+}
+
+#buttons {
+    margin-top: 10px;
+    flex-direction: row; /* 横並びに配置 */
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+#clearbtn {
+    background-color: #ff6464; /* 元の色 */
+    color: white;
+    border: 2px solid black;
+}
+
+#guessbtn {
+    background-color: #5ac8fa; /* 元の色 */
+    color: white;
+    border: 2px solid black;
+}
+
+#hintbtn {
+    background-color: #28a745; /* 緑色に指定 */
+    color: white;
+    border: 2px solid black;
+}
+
+#next-btn, #reset-btn {
+    background-color: #28a745; /* 緑色 */
+    color: white;
+    border: 2px solid black;
+}
+
+#scoreboard {
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+.hint-circle {
+    width: 20px;
+    height: 20px;
+    margin: 0 5px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: white;
+    border: 1px solid gray;
+}
+
+.hint-circle.gray {
+    background-color: gray;
+}

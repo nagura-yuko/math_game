@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Game - Handwriting Recognition</title>
+
+    <!-- p5.js と TensorFlow.js -->
+    <script src="{{ url_for('static', filename='libraries/p5.js') }}"></script>
+    <script src="{{ url_for('static', filename='libraries/p5.dom.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="{{ url_for('static', filename='sketch.js') }}"></script>  <!-- メインのJavaScriptファイル -->
+
+    <!-- CSSファイル -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- 問題選択画面 -->
+    <div id="operation-selection">
+        <button class="btn" onClick="selectOperation('question1')">たしざん</button>
+        <button class="btn" onClick="selectOperation('question2')">ひきざん</button>
+        <button class="btn" onClick="selectOperation('question3')">かけざん</button>
+        <button class="btn" onClick="selectOperation('question4')">わりざん</button>
+    </div>
+
+    <!-- 問題エリア -->
+    <div id="problem-area" style="display:none;">
+        <h2 id="problem-text"></h2>
+    </div>
+
+    <!-- キャンバスエリア -->
+    <div id="canvas-area" style="display:none;"></div>
+
+    <!-- ヒントエリア -->
+    <div id="hint-area" style="margin-bottom: 20px;"></div>
+
+    <!-- ボタンエリア -->
+    <div id="buttons">
+        <button id="clearbtn" class="btn" onClick="clearCanvas()">けしごむ</button>
+        <button id="guessbtn" class="btn" onClick="guessAndSave()">こたえ</button>
+        <button id="hintbtn" class="btn" onClick="showHint()">ヒント</button>
+        <button id="next-btn" class="btn" onClick="loadNextProblem()" style="display:none;">つぎのもんだい</button>
+        <button id="reset-btn" class="btn" onClick="resetGame()" style="display:none;">さいしょにもどる</button>
+    </div>
+
+    <!-- 判定結果表示エリア -->
+    <div id="textPredict">
+        <p id="predict"></p>
+    </div>
+
+</body>
+</html>

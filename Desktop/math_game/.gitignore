@@ -1,0 +1,13 @@
+# Ignore virtual environment
+venv/
+.env/
+
+# Ignore system files
+.DS_Store
+*.log
+*.tmp
+__pycache__/
+*.pyc
+
+# Ignore other directories
+node_modules/
