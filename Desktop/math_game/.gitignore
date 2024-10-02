@@ -1,13 +1,18 @@
-# Ignore virtual environment
-venv/
-.env/
-
-# Ignore system files
-.DS_Store
+# Ignore system files and folders
 *.log
 *.tmp
+.DS_Store
+*.rtf
+*.psd
+*.png
 __pycache__/
 *.pyc
 
-# Ignore other directories
+# Ignore virtual environments
+venv/
+.env/
 node_modules/
+
+# Ignore macOS-specific files
+.Trash/
+*.localized
