@@ -144,12 +144,19 @@ function guessAndSave() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json().then(errorData => {
+                throw new Error(`Server Error: ${errorData.error || 'Unknown error'}`);
+            });
         }
         return response.json();
     })
     .then(data => {
         let pred = data.prediction;
+        if (pred === undefined) {
+            document.getElementById('predict').innerHTML = '予測結果が取得できませんでした。';
+            return;
+        }
+
         if (pred == currentAnswer) {
             document.getElementById('predict').innerHTML = `${pred} 正解！`;
             correctCount++;
@@ -169,7 +176,7 @@ function guessAndSave() {
     })
     .catch(error => {
         console.error('Error during prediction:', error);
-        document.getElementById('predict').innerHTML = 'エラーが発生しました。再度お試しください。';
+        document.getElementById('predict').innerHTML = `エラーが発生しました: ${error.message}`;
     });
 }
 

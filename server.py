@@ -142,6 +142,9 @@ def predict():
         # 複数桁を認識できるようにまず画像を分割しようと試みる
         digit_images = split_digits(img)
 
+        if not digit_images:
+            return jsonify({'error': 'No digits found'}), 400
+
         # 桁が複数あった場合
         predictions = []
         for digit_img in digit_images:
@@ -156,7 +159,8 @@ def predict():
 
     except Exception as e:
         print(f"Error during prediction: {e}")
-        return jsonify({'error': 'Prediction failed'}), 500
+        return jsonify({'error': 'Prediction failed', 'message': str(e)}), 500
+
 
 if __name__ == "__main__":
     # ローカル環境での実行用。Renderでのデプロイではgunicornが使用されるため、これは無視される
