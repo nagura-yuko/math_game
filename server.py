@@ -11,14 +11,10 @@ app = Flask(__name__)
 
 # mnist_model_updated.h5のロード
 model_path = os.path.join('static', 'classifier', 'mnist_model_updated.h5')
-if os.path.exists(model_path):
-    model = load_model(model_path)
-else:
-    raise FileNotFoundError(f"Model not found at {model_path}")
+model = load_model(model_path)
 
 # 保存するディレクトリ
 save_dir = 'static/saved_images'
-os.makedirs(save_dir, exist_ok=True)  # 保存先ディレクトリが存在しない場合作成
 
 # 画像の形状を正規化し、余白を取り除きつつ縦横比を保持する関数
 def normalize_shape(img):
@@ -151,5 +147,4 @@ def predict():
     return jsonify({'prediction': result})
 
 if __name__ == "__main__":
-    # ローカル環境での実行用。Renderでのデプロイではgunicornが使用されるため、これは無視される
     app.run(host="0.0.0.0", port=5000, debug=True)
