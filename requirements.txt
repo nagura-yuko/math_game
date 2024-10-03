@@ -10,4 +10,6 @@ packaging==24.1
 werkzeug==3.0.4
 opencv-python-headless
 tensorflow==2.16.2
+flask_cors
+
 
