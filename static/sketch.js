@@ -40,12 +40,11 @@ function selectOperation(operation) {
     document.getElementById("canvas-area").style.display = "block";
     document.getElementById("buttons").style.display = "block";
 
-     // ボタンエリアを横並びにするために display: flex を適用
+    // ボタンエリアを横並びにするために display: flex を適用
     const buttonsArea = document.getElementById("buttons");
     buttonsArea.style.display = "flex";  // 横並びにする
     buttonsArea.style.justifyContent = "center";  // ボタンを中央に配置
     buttonsArea.style.gap = "10px";  // ボタン間のスペースを設定
-
 
     const url = `/get_csv_files?operation=${operation}`;
     
@@ -144,8 +143,13 @@ function guessAndSave() {
     })
     .then(response => {
         if (!response.ok) {
+            // サーバーからのエラーメッセージを取得
             return response.json().then(errorData => {
-                throw new Error(`Server Error: ${errorData.error || 'Unknown error'}`);
+                const errorMsg = errorData.error || 'Unknown error';
+                throw new Error(`Server Error: ${errorMsg}`);
+            }).catch(parseError => {
+                // JSONのパースエラーが発生した場合
+                throw new Error(`HTTP error! status: ${response.status}`);
             });
         }
         return response.json();
