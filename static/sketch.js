@@ -180,7 +180,6 @@ function guessAndSave() {
     });
 }
 
-
 function showHint() {
     clearHint();
     let problem1 = problems[currentProblemIndex - 1]["problem1"];

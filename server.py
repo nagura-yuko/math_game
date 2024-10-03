@@ -161,7 +161,6 @@ def predict():
         print(f"Error during prediction: {e}")
         return jsonify({'error': 'Prediction failed', 'message': str(e)}), 500
 
-
 if __name__ == "__main__":
     # ローカル環境での実行用。Renderでのデプロイではgunicornが使用されるため、これは無視される
     app.run(host="0.0.0.0", port=5000, debug=True)
