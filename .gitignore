@@ -1,0 +1,26 @@
+# System files
+*.log
+*.tmp
+.DS_Store
+*.psd
+*.png
+*.rtf
+.vscode/
+node_modules/
+__pycache__/
+*.pyc
+*.swp
+
+# Virtual environments
+venv/
+.env/
+
+# macOS-specific files
+.Trash/
+.localized
+*.ini
+*.icloud
+
+# User directories (adjust if needed)
+Applications/
+Creative\ Cloud\ Files/
