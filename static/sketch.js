@@ -141,29 +141,38 @@ function guessAndSave() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ image: imageData })
-    }).then(response => response.json())
-      .then(data => {
-          let pred = data.prediction;
-          if (pred == currentAnswer) {
-              document.getElementById('predict').innerHTML = `${pred} 正解！`;
-              correctCount++;
-          } else {
-              document.getElementById('predict').innerHTML = `${pred} 不正解！答えは ${currentAnswer} です。`;
-              incorrectCount++;
-              incorrectProblems.push({
-                  problem: currentProblemText,
-                  correctAnswer: currentAnswer
-              });
-          }
-          answered = true;
-          document.getElementById("guessbtn").style.display = "none";
-          document.getElementById("clearbtn").style.display = "none";
-          document.getElementById("hintbtn").style.display = "none";
-          document.getElementById("next-btn").style.display = "block";
-      }).catch(error => {
-          console.error('Error:', error);
-      });
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        let pred = data.prediction;
+        if (pred == currentAnswer) {
+            document.getElementById('predict').innerHTML = `${pred} 正解！`;
+            correctCount++;
+        } else {
+            document.getElementById('predict').innerHTML = `${pred} 不正解！答えは ${currentAnswer} です。`;
+            incorrectCount++;
+            incorrectProblems.push({
+                problem: currentProblemText,
+                correctAnswer: currentAnswer
+            });
+        }
+        answered = true;
+        document.getElementById("guessbtn").style.display = "none";
+        document.getElementById("clearbtn").style.display = "none";
+        document.getElementById("hintbtn").style.display = "none";
+        document.getElementById("next-btn").style.display = "block";
+    })
+    .catch(error => {
+        console.error('Error during prediction:', error);
+        document.getElementById('predict').innerHTML = 'エラーが発生しました。再度お試しください。';
+    });
 }
+
 
 function showHint() {
     clearHint();

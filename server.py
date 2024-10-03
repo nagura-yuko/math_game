@@ -127,28 +127,36 @@ def save_image():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.json
-    image_data = data['image']
+    try:
+        data = request.json
+        image_data = data['image']
 
-    # 画像データを処理
-    image_data = image_data.split(",")[1]
-    img = np.frombuffer(base64.b64decode(image_data), dtype=np.uint8)
-    img = cv2.imdecode(img, cv2.IMREAD_GRAYSCALE)
+        # 画像データを処理
+        image_data = image_data.split(",")[1]
+        img = np.frombuffer(base64.b64decode(image_data), dtype=np.uint8)
+        img = cv2.imdecode(img, cv2.IMREAD_GRAYSCALE)
 
-    # 複数桁を認識できるようにまず画像を分割しようと試みる
-    digit_images = split_digits(img)
+        if img is None:
+            return jsonify({'error': 'Image decoding failed'}), 400
 
-    # 桁が複数あった場合
-    predictions = []
-    for digit_img in digit_images:
-        # モデルで予測
-        prediction = model.predict(digit_img).argmax(axis=1)[0]
-        predictions.append(str(prediction))
+        # 複数桁を認識できるようにまず画像を分割しようと試みる
+        digit_images = split_digits(img)
 
-    # 複数桁の数字を結合
-    result = ''.join(predictions)
+        # 桁が複数あった場合
+        predictions = []
+        for digit_img in digit_images:
+            # モデルで予測
+            prediction = model.predict(digit_img).argmax(axis=1)[0]
+            predictions.append(str(prediction))
 
-    return jsonify({'prediction': result})
+        # 複数桁の数字を結合
+        result = ''.join(predictions)
+
+        return jsonify({'prediction': result}), 200
+
+    except Exception as e:
+        print(f"Error during prediction: {e}")
+        return jsonify({'error': 'Prediction failed'}), 500
 
 if __name__ == "__main__":
     # ローカル環境での実行用。Renderでのデプロイではgunicornが使用されるため、これは無視される
