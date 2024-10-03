@@ -1,3 +1,4 @@
+from flask_cors import CORS
 from flask import Flask, request, jsonify, render_template
 from tensorflow.keras.models import load_model
 import numpy as np
@@ -7,6 +8,7 @@ import datetime
 import base64
 import random
 import logging
+import time
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -143,41 +145,47 @@ def save_image():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
+        # クライアントから送信されたJSONデータを受信
         data = request.json
+        if not data or 'image' not in data:
+            return jsonify({'error': 'No image data received'}), 400
+
+        # 画像データをデコード
         image_data = data['image']
+        try:
+            image_data = image_data.split(",")[1]  # Base64形式のデータから画像部分を取得
+            img = np.frombuffer(base64.b64decode(image_data), dtype=np.uint8)
+            img = cv2.imdecode(img, cv2.IMREAD_GRAYSCALE)
+        except Exception as e:
+            return jsonify({'error': 'Image decoding failed', 'message': str(e)}), 400
 
-        # 画像データを処理
-        image_data = image_data.split(",")[1]
-        img = np.frombuffer(base64.b64decode(image_data), dtype=np.uint8)
-        img = cv2.imdecode(img, cv2.IMREAD_GRAYSCALE)
-
+        # デコードした画像が無効である場合
         if img is None:
-            logging.error("Image decoding failed")
-            return jsonify({'error': 'Image decoding failed'}), 400
+            return jsonify({'error': 'Invalid image data'}), 400
 
-        # 複数桁を認識できるようにまず画像を分割しようと試みる
+        # 画像を桁ごとに分割
         digit_images = split_digits(img)
+        if not digit_images or len(digit_images) == 0:
+            return jsonify({'error': 'No digits found in the image'}), 400
 
-        if not digit_images:
-            logging.error("No digits found")
-            return jsonify({'error': 'No digits found'}), 400
-
-        # 桁が複数あった場合
+        # モデルによる予測処理
         predictions = []
         for digit_img in digit_images:
-            # モデルで予測
-            prediction = model.predict(digit_img).argmax(axis=1)[0]
-            predictions.append(str(prediction))
+            try:
+                # モデルで予測
+                prediction = model.predict(digit_img).argmax(axis=1)[0]
+                predictions.append(str(prediction))
+            except Exception as e:
+                return jsonify({'error': 'Prediction failed', 'message': str(e)}), 500
 
-        # 複数桁の数字を結合
+        # 予測結果を結合して返却
         result = ''.join(predictions)
-
-        logging.info(f"Prediction result: {result}")
         return jsonify({'prediction': result}), 200
 
     except Exception as e:
         logging.error(f"Error during prediction: {e}")
-        return jsonify({'error': 'Prediction failed', 'message': str(e)}), 500
+        return jsonify({'error': 'Unexpected error', 'message': str(e)}), 500
+
 
 if __name__ == "__main__":
     # ローカル環境での実行用。Renderでのデプロイではgunicornが使用されるため、これは無視される
