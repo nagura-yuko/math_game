@@ -9,6 +9,7 @@ import base64
 import random
 import logging
 import time
+import gc
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -82,7 +83,6 @@ def split_digits(img):
         x, y, w, h = box
         digit_img = img[y:y + h, x:x + w]  # 各桁の画像を切り取る
         digit_img = normalize_shape(digit_img)  # 正規化して余白を消去
-        digit_img = digit_img.reshape(1, 28, 28, 1) / 255.0  # 正規化
         digit_imgs.append(digit_img)
 
     return digit_imgs
@@ -165,19 +165,21 @@ def predict():
         if not digit_images:
             return jsonify({'error': 'No digits found'}), 400
 
-        # モデルで予測
-        predictions = []
-        for digit_img in digit_images:
-            prediction = model.predict(digit_img).argmax(axis=1)[0]
-            predictions.append(str(prediction))
+        # モデルでバッチ予測
+        digit_images = np.array(digit_images).reshape(-1, 28, 28, 1)
+        predictions = model.predict(digit_images).argmax(axis=1)
 
         # 複数桁の数字を結合
-        result = ''.join(predictions)
+        result = ''.join(map(str, predictions))
+
+        # メモリ解放
+        del img, digit_images, predictions
+        gc.collect()
 
         return jsonify({'prediction': result}), 200
 
     except Exception as e:
-        print(f"Error during prediction: {e}")
+        logging.error(f"Error during prediction: {e}")
         return jsonify({'error': 'Prediction failed', 'message': str(e)}), 500
 
 if __name__ == "__main__":
