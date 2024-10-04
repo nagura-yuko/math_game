@@ -143,13 +143,8 @@ function guessAndSave() {
     })
     .then(response => {
         if (!response.ok) {
-            // サーバーからのエラーメッセージを取得
             return response.json().then(errorData => {
-                const errorMsg = errorData.error || 'Unknown error';
-                throw new Error(`Server Error: ${errorMsg}`);
-            }).catch(parseError => {
-                // JSONのパースエラーが発生した場合
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Server Error: ${errorData.error || 'Unknown error'}`);
             });
         }
         return response.json();

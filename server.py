@@ -145,47 +145,40 @@ def save_image():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # クライアントから送信されたJSONデータを受信
         data = request.json
-        if not data or 'image' not in data:
-            return jsonify({'error': 'No image data received'}), 400
-
-        # 画像データをデコード
         image_data = data['image']
-        try:
-            image_data = image_data.split(",")[1]  # Base64形式のデータから画像部分を取得
-            img = np.frombuffer(base64.b64decode(image_data), dtype=np.uint8)
-            img = cv2.imdecode(img, cv2.IMREAD_GRAYSCALE)
-        except Exception as e:
-            return jsonify({'error': 'Image decoding failed', 'message': str(e)}), 400
 
-        # デコードした画像が無効である場合
+        # 画像データを処理
+        image_data = image_data.split(",")[1]
+        img = np.frombuffer(base64.b64decode(image_data), dtype=np.uint8)
+        img = cv2.imdecode(img, cv2.IMREAD_GRAYSCALE)
+
         if img is None:
-            return jsonify({'error': 'Invalid image data'}), 400
+            return jsonify({'error': 'Image decoding failed'}), 400
 
-        # 画像を桁ごとに分割
+        # 画像をリサイズしてメモリ使用量を削減
+        img = cv2.resize(img, (28, 28))
+
+        # 複数桁を認識できるように画像を分割
         digit_images = split_digits(img)
-        if not digit_images or len(digit_images) == 0:
-            return jsonify({'error': 'No digits found in the image'}), 400
 
-        # モデルによる予測処理
+        if not digit_images:
+            return jsonify({'error': 'No digits found'}), 400
+
+        # モデルで予測
         predictions = []
         for digit_img in digit_images:
-            try:
-                # モデルで予測
-                prediction = model.predict(digit_img).argmax(axis=1)[0]
-                predictions.append(str(prediction))
-            except Exception as e:
-                return jsonify({'error': 'Prediction failed', 'message': str(e)}), 500
+            prediction = model.predict(digit_img).argmax(axis=1)[0]
+            predictions.append(str(prediction))
 
-        # 予測結果を結合して返却
+        # 複数桁の数字を結合
         result = ''.join(predictions)
+
         return jsonify({'prediction': result}), 200
 
     except Exception as e:
-        logging.error(f"Error during prediction: {e}")
-        return jsonify({'error': 'Unexpected error', 'message': str(e)}), 500
-
+        print(f"Error during prediction: {e}")
+        return jsonify({'error': 'Prediction failed', 'message': str(e)}), 500
 
 if __name__ == "__main__":
     # ローカル環境での実行用。Renderでのデプロイではgunicornが使用されるため、これは無視される
